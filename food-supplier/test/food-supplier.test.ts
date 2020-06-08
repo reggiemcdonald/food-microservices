@@ -29,13 +29,13 @@ const mockIdFinder: IdFinder = {
     switch (synonym) {
       case 'flour':
       case 'bakers flour':
-        return Promise.resolve('100');
+        return '100';
       case 'white sugar':
       case 'sugar':
-        return Promise.resolve('101');
+        return '101';
       case 'butter':
       case 'unsalted butter':
-        return Promise.resolve('102');
+        return '102';
       default:
         throw new Error('unknown type');
     }
