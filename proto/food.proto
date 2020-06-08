@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+service FoodSupplier {
+  // Returns a list of vendors that supply the specified food
+  rpc FindItem (FindItemQuery) returns (FindItemResponse) {}
+}
+
+service FoodVendor {
+  rpc GetItemAvailability(VendorItemQuery) returns (ItemAvailability) {}
+}
+
+message Vendor {
+  string id = 1;
+  string name = 2;
+}
+
+message FindItemQuery {
+  string itemName = 1; 
+}
+
+message FindItemResponse {
+  repeated Vendor vendors = 1;
+}
+
+message VendorItemQuery {
+  string vendorId = 1;
+  string itemId = 2;
+}
+
+message ItemAvailability {
+  string id = 1;
+  string name = 2;
+  int32 count = 3;
+  double price = 4;
+}

@@ -1,0 +1,17 @@
+
+[
+  {"vendorId": "001", "itemId": "100", "quantity": 5, "price": 10.98},
+  {"vendorId": "001", "itemId": "101", "quantity": 6, "price": 12.80},
+  {"vendorId": "001", "itemId": "106", "quantity": 11, "price": 5.66},
+  {"vendorId": "002", "itemId": "100", "quantity": 2, "price": 13.49},
+  {"vendorId": "002", "itemId": "101", "quantity": 4, "price": 7.88},
+  {"vendorId": "002", "itemId": "102", "quantity": 24, "price": 3.49},
+  {"vendorId": "002", "itemId": "103", "quantity": 13, "price": 5.65},
+  {"vendorId": "003", "itemId": "100", "quantity": 10, "price": 13.99},
+  {"vendorId": "003", "itemId": "101", "quantity": 10, "price": 6.30},
+  {"vendorId": "003", "itemId": "102", "quantity": 0, "price": 2.67},
+  {"vendorId": "003", "itemId": "103", "quantity": 0, "price": 2.65},
+  {"vendorId": "003", "itemId": "104", "quantity": 33, "price": 5.49},
+  {"vendorId": "003", "itemId": "105", "quantity": 23, "price": 3.88},
+  {"vendorId": "003", "itemId": "106", "quantity": 19, "price": 7.49}
+] 

@@ -1,0 +1,35 @@
+{
+  "100": [
+    "flour",
+    "baking flour",
+    "bakers flour"
+  ],
+  "101": [
+    "sugar",
+    "white sugar",
+    "baking sugar"
+  ],
+  "102": [
+    "baking powder"
+  ],
+  "103": [
+    "baking soda"
+  ],
+  "104": [
+    "butter",
+    "unsalted butter",
+    "salted butter"
+  ],
+  "105": [
+    "milk",
+    "whole milk",
+    "skim milk",
+    "2% milk",
+    "2 percent milk"
+  ],
+  "106": [
+    "chocolate chips",
+    "chips",
+    "bakers chocolate"
+  ]
+}
