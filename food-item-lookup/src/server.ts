@@ -18,7 +18,6 @@ app.get('/api/nameLookup', (req, res) => {
     return;
   }
   try {
-    console.log(`data is ${JSON.stringify(foodItemLookup.synonyms)}`);
     const id = foodItemLookup.findItem(name);
     res.status(200).send(id);
   } catch (e) {
