@@ -1,0 +1,26 @@
+{
+  "name": "food-supplier",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "mocha -r ts-node/register test/**/*.test.ts",
+    "start": "PORT=50052 ITEM_LOOKUP_API_PORT=50053 node out/src/server.js"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.0.5",
+    "@grpc/proto-loader": "^0.5.4",
+    "axios": "^0.19.2",
+    "typescript": "^3.9.5"
+  },
+  "devDependencies": {
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^14.0.11",
+    "mocha": "^7.2.0",
+    "ts-node": "^8.10.2"
+  }
+}
+
