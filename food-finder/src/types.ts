@@ -19,3 +19,4 @@ export interface ItemReport {
   vendor: Vendor;
   itemAvailability: FoodItemAvailability;
 }
+
