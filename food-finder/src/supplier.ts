@@ -1,14 +1,14 @@
 import * as grpc from '@grpc/grpc-js';
 import * as protoloader from '@grpc/proto-loader';
 import {join} from 'path';
-import { Vendor } from './types';
+import { Vendor, FindItemResponse } from './types';
 
 export interface SupplierService {
   /**
    * Returns a list of vendors that carry the specified item
    * @param itemName string the item name that is being looked for now
    */
-  findItem(itemName: string): Promise<Vendor[]>;
+  findItem(itemName: string): Promise<FindItemResponse>;
 }
 
 export default class DefaultSupplierService implements SupplierService {
@@ -21,22 +21,21 @@ export default class DefaultSupplierService implements SupplierService {
     this.supplierClient = new definition.FoodSupplier(url, grpc.credentials.createInsecure());
   }
   
-  findItem(itemName: string): Promise<Vendor[]> {
+  findItem(itemName: string): Promise<FindItemResponse> {
     return new Promise((resolve, reject) => {
       this.supplierClient.findItem({itemName}, (err: any, res: any) => {
         if (err) {
           return reject(err);
         }
-        const {vendors} = res;
-        if (!vendors) {
+        const {itemId, vendors} = res;
+        if (!vendors || !itemId) {
           return  reject(`invalid data was returned from food supplier`);
         }
         const vendorsFound: Vendor[] = vendors.map((vendor: any) => {
-          const {id, name} = vendor;
           return {id: vendor.id, name: vendor.name}
         });
         vendorsFound.filter(v => v.id && v.name);
-        resolve(vendorsFound);
+        resolve({itemId, vendors: vendorsFound});
       });
     });
   }

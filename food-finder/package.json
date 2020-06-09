@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "exit 1",
+    "start": "PORT=50054 SUPPLIER_PORT=50052 VENDOR_PORT=50051 node out/src/index.js",
     "test": "mocha -r ts-node/register test/**/*.test.ts"
   },
   "author": "",

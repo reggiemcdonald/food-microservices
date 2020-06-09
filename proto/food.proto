@@ -19,7 +19,8 @@ message FindItemQuery {
 }
 
 message FindItemResponse {
-  repeated Vendor vendors = 1;
+  string itemId = 1;
+  repeated Vendor vendors = 2;
 }
 
 message VendorItemQuery {
