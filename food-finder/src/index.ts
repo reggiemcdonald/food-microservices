@@ -21,7 +21,7 @@ const startServer = () => {
     const itemName: string = req.query.itemName as string;
     foodFinder.findItemByName(itemName)
       .then(report => res.status(200).send(report))
-      .catch(e => res.status(403).send({messgae: e.message}));
+      .catch(e => res.status(404).send({messgae: e.message}));
   });
   app.listen(port, () => console.log(`Food Finder listening on port ${port}`));
 };
