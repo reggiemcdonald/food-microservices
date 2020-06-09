@@ -19,7 +19,8 @@ message FindItemQuery {
 }
 
 message FindItemResponse {
-  repeated Vendor vendors = 1;
+  string itemId = 1;
+  repeated Vendor vendors = 2;
 }
 
 message VendorItemQuery {
@@ -30,6 +31,6 @@ message VendorItemQuery {
 message ItemAvailability {
   string id = 1;
   string name = 2;
-  int32 count = 3;
+  int32 quantity = 3;
   double price = 4;
 }

@@ -11,7 +11,7 @@ export default class FoodSupplier {
     this.vendorMap = vendors;
     this.idFinder = idFinder;
   }
-  async findItem(call: any, callback: any) {
+  async findItem(call: any, callback: any): Promise<any> {
     const {request} = call;
     const {itemName} = request;
     if (!itemName) {
@@ -33,7 +33,7 @@ export default class FoodSupplier {
     const vendors = vendorIdsCarryingItem.map(vendorId => {
       return {id: vendorId, name: this.vendorMap[vendorId]};
     });
-    callback(null, {vendors});
+    callback(null, {itemId, vendors});
   }
 }
 
