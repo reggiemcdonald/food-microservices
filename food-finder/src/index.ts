@@ -14,8 +14,8 @@ const startServer = () => {
     console.log(message);
     return;
   }
-  const supplierService = new DefaultSupplierService(`localhost:${supplierPort}`);
-  const vendorService = new DefaultVendorService(`localhost:${vendorPort}`);
+  const supplierService = new DefaultSupplierService(`food-supplier:${supplierPort}`);
+  const vendorService = new DefaultVendorService(`food-vendor:${vendorPort}`);
   const foodFinder = new FoodFinder(supplierService, vendorService);
   app.get('/api/findItem', (req, res) => {
     const itemName: string = req.query.itemName as string;
