@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "test": "mocha -r ts-node/register test/**/*.test.ts",
-    "start": "PORT=50052 ITEM_LOOKUP_API_PORT=50053 node out/src/server.js"
+    "start": "ITEM_LOOKUP_API_PORT=50053 node out/src/server.js"
   },
   "author": "",
   "license": "Apache-2.0",
