@@ -2,27 +2,46 @@ import express from 'express';
 import DefaultSupplierService, { SupplierService } from './supplier';
 import DefaultVendorService, { VendorService } from './vendor';
 import FoodFinder from './food-finder';
+import { newDefaultTracer } from './trace';
+import { ConsoleSpanExporter } from '@opentelemetry/tracing';
 
 const startServer = () => {
   const app: express.Application = express();
   const port = process.env.PORT;
   const supplierPort = process.env.SUPPLIER_PORT;
   const vendorPort = process.env.VENDOR_PORT;
-  if (!port || !supplierPort || !vendorPort) {
+  const projectId = process.env.PROJECT_ID;
+  if (!port || !supplierPort || !vendorPort || !projectId) {
     const message = 'one or more environment variables were missing. Ensure that ' + 
-      'PORT, SUPPLIER_PORT, and VENDOR_PORT are defined';
+      'PORT, SUPPLIER_PORT, VENDOR_PORT, PROJECT_ID are defined';
     console.log(message);
     return;
   }
-  const supplierService = new DefaultSupplierService(`food-supplier:${supplierPort}`);
-  const vendorService = new DefaultVendorService(`food-vendor:${vendorPort}`);
-  const foodFinder = new FoodFinder(supplierService, vendorService);
+  const tracer = newDefaultTracer(projectId, 'food-finder-endpoint', 
+    {express: true}, new ConsoleSpanExporter()
+  );
+
+  const supplierService = new DefaultSupplierService(`food-supplier:${supplierPort}`, 
+    newDefaultTracer(projectId, 'supplier-client', { grpc: true }, new ConsoleSpanExporter())
+  );
+  const vendorService = new DefaultVendorService(`food-vendor:${vendorPort}`, 
+    newDefaultTracer(projectId, 'vendor-client', { grpc: true }, new ConsoleSpanExporter())
+  );
+  const foodFinder = new FoodFinder(supplierService, vendorService, tracer);  
+
   app.get('/api/findItem', (req, res) => {
     const itemName: string = req.query.itemName as string;
-    foodFinder.findItemByName(itemName)
-      .then(report => res.status(200).send(report))
-      .catch(e => res.status(404).send({messgae: e.message}));
+    const span = tracer.startSpan('/api/findItem', {
+      attributes: {itemName},
+    });
+    tracer.withSpan(span, () => {
+      foodFinder.findItemByName(itemName)
+        .then(report => res.status(200).send(report))
+        .catch(e => res.status(404).send({message: e.message}))
+        .finally(() => span.end());
+    });
   });
+
   app.listen(port, () => console.log(`Food Finder listening on port ${port}`));
 };
 
