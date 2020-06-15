@@ -2,6 +2,9 @@ import 'mocha';
 import * as assert from 'assert';
 import FoodSupplier, {makeCatalog, makeVendors} from '../src/food-supplier';
 import {Catalog, IdFinder, VendorMap} from '../src/types';
+import { Tracer } from '@opentelemetry/api';
+import { newDefaultTracer } from '../src/trace';
+import { ConsoleSpanExporter } from '@opentelemetry/tracing';
 
 const catalog: Catalog = {
   '100': [
@@ -42,10 +45,12 @@ const mockIdFinder: IdFinder = {
   }
 }
 
+const tracer = newDefaultTracer('test', 'test-tracer', {}, new ConsoleSpanExporter());
+
 describe('FoodSupplier::findItem', () => {
   let foodSupplier: FoodSupplier;
   beforeEach(() => {
-    foodSupplier = new FoodSupplier(catalog, vendors, mockIdFinder);
+    foodSupplier = new FoodSupplier(tracer, catalog, vendors, mockIdFinder);
   });
   it('should return a list of vendor IDs', () => {
     const request = {itemName: 'Flour'};
@@ -55,6 +60,7 @@ describe('FoodSupplier::findItem', () => {
         return;
       }
       const expected = {
+        itemId: '100',
         vendors: [
           {id: '001', name: 'Food Vendor A'},
           {id: '002', name: 'Food Vendor B'},
