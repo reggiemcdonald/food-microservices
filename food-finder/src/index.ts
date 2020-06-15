@@ -3,7 +3,7 @@ import DefaultSupplierService, { SupplierService } from './supplier';
 import DefaultVendorService, { VendorService } from './vendor';
 import FoodFinder from './food-finder';
 import { newDefaultTracer } from './trace';
-import { ConsoleSpanExporter } from '@opentelemetry/tracing';
+import { TraceExporter } from '@google-cloud/opentelemetry-cloud-trace-exporter';
 
 const startServer = () => {
   const app: express.Application = express();
@@ -18,15 +18,13 @@ const startServer = () => {
     return;
   }
   const tracer = newDefaultTracer(projectId, 'food-finder-endpoint', 
-    {express: true}, new ConsoleSpanExporter()
+    {express: true}, new TraceExporter({
+      projectId,
+    })
   );
 
-  const supplierService = new DefaultSupplierService(`food-supplier:${supplierPort}`, 
-    newDefaultTracer(projectId, 'supplier-client', { grpc: true }, new ConsoleSpanExporter())
-  );
-  const vendorService = new DefaultVendorService(`food-vendor:${vendorPort}`, 
-    newDefaultTracer(projectId, 'vendor-client', { grpc: true }, new ConsoleSpanExporter())
-  );
+  const supplierService = new DefaultSupplierService(`food-supplier:${supplierPort}`, tracer);
+  const vendorService = new DefaultVendorService(`food-vendor:${vendorPort}`, tracer);
   const foodFinder = new FoodFinder(supplierService, vendorService, tracer);  
 
   app.get('/api/findItem', (req, res) => {
