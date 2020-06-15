@@ -18,7 +18,7 @@ const startServer = () => {
     return;
   }
   const tracer = newDefaultTracer(projectId, 'food-finder-endpoint', 
-    {express: true}, new TraceExporter({
+    {express: true, grpc: true}, new TraceExporter({
       projectId,
     })
   );
