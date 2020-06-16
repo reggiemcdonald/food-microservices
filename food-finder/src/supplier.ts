@@ -1,4 +1,4 @@
-import * as grpc from '@grpc/grpc-js';
+import * as grpc from 'grpc';
 import * as protoloader from '@grpc/proto-loader';
 import { Tracer, Span } from '@opentelemetry/api';
 import {join} from 'path';

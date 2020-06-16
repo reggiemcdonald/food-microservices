@@ -1,9 +1,14 @@
+import { newDefaultTracer } from './trace';
+
+const tracer = newDefaultTracer({
+  grpc: true,
+  express: true,
+});
+
 import express from 'express';
 import DefaultSupplierService, { SupplierService } from './supplier';
 import DefaultVendorService, { VendorService } from './vendor';
 import FoodFinder from './food-finder';
-import { newDefaultTracer } from './trace';
-import { TraceExporter } from '@google-cloud/opentelemetry-cloud-trace-exporter';
 
 const startServer = () => {
   const app: express.Application = express();
@@ -11,17 +16,13 @@ const startServer = () => {
   const supplierPort = process.env.SUPPLIER_PORT;
   const vendorPort = process.env.VENDOR_PORT;
   const projectId = process.env.PROJECT_ID;
+
   if (!port || !supplierPort || !vendorPort || !projectId) {
     const message = 'one or more environment variables were missing. Ensure that ' + 
       'PORT, SUPPLIER_PORT, VENDOR_PORT, PROJECT_ID are defined';
     console.log(message);
     return;
   }
-  const tracer = newDefaultTracer(projectId, 'food-finder-endpoint', 
-    {express: true, grpc: true}, new TraceExporter({
-      projectId,
-    })
-  );
 
   const supplierService = new DefaultSupplierService(`food-supplier:${supplierPort}`, tracer);
   const vendorService = new DefaultVendorService(`food-vendor:${vendorPort}`, tracer);

@@ -4,8 +4,7 @@ import { SupplierService } from '../src/supplier';
 import { FindItemResponse, FoodItemAvailability, Vendor, ItemReport } from '../src/types';
 import { VendorService } from '../src/vendor';
 import FoodFinder from '../src/food-finder';
-import { newDefaultTracer } from '../src/trace';
-import { ConsoleSpanExporter } from '@opentelemetry/tracing';
+import { newTestTracer } from '../src/trace';
 
 const foodVendorA: Vendor = {
   id: '001',
@@ -64,9 +63,8 @@ describe('FoodFinder::findItemByName', () => {
   let foodFinder: FoodFinder;
   
   beforeEach(() => {
-    foodFinder = new FoodFinder(mockSupplier, mockVendor, 
-      newDefaultTracer('1', 'test-tracer', {}, new ConsoleSpanExporter())
-    );
+    foodFinder = 
+      new FoodFinder(mockSupplier, mockVendor, newTestTracer());
   });
 
   it('should successfully find item availability for an available item', async () => {
