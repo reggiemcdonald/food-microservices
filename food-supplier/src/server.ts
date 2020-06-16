@@ -1,3 +1,8 @@
+import { newDefaultTracer } from './trace';
+const tracer = newDefaultTracer({
+  grpc: true,
+});
+
 import {join} from 'path';
 import * as grpc from '@grpc/grpc-js';
 import * as protoloader from '@grpc/proto-loader';
@@ -5,7 +10,7 @@ import {readFileSync} from 'fs';
 import { TraceExporter } from '@google-cloud/opentelemetry-cloud-trace-exporter';
 import {Catalog, VendorMap} from './types';
 import FoodSupplier, { makeCatalog, makeVendors } from './food-supplier';
-import { newDefaultTracer } from './trace';
+
 
 const startServer = (): void => {
   const port = process.env.PORT;
@@ -15,10 +20,7 @@ const startServer = (): void => {
     process.exitCode = 1;
     return;
   }
-  const tracer = newDefaultTracer(projectId, 'food-supplier', 
-  {grpc: true}, new TraceExporter({
-    projectId,
-  }));
+  
   const catalog: Catalog = makeCatalog(
     JSON.parse(readFileSync(join(__dirname, '../../../data/stock.json'), {encoding: 'utf-8'}))
   );

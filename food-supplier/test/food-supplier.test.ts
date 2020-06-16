@@ -3,8 +3,7 @@ import * as assert from 'assert';
 import FoodSupplier, {makeCatalog, makeVendors} from '../src/food-supplier';
 import {Catalog, IdFinder, VendorMap} from '../src/types';
 import { Tracer } from '@opentelemetry/api';
-import { newDefaultTracer } from '../src/trace';
-import { ConsoleSpanExporter } from '@opentelemetry/tracing';
+import { newTestTracer } from '../src/trace';
 
 const catalog: Catalog = {
   '100': [
@@ -45,12 +44,11 @@ const mockIdFinder: IdFinder = {
   }
 }
 
-const tracer = newDefaultTracer('test', 'test-tracer', {}, new ConsoleSpanExporter());
 
 describe('FoodSupplier::findItem', () => {
   let foodSupplier: FoodSupplier;
   beforeEach(() => {
-    foodSupplier = new FoodSupplier(tracer, catalog, vendors, mockIdFinder);
+    foodSupplier = new FoodSupplier(newTestTracer(), catalog, vendors, mockIdFinder);
   });
   it('should return a list of vendor IDs', () => {
     const request = {itemName: 'Flour'};
