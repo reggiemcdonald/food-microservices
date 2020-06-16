@@ -16,10 +16,6 @@ const newTracer = (pluginOptions: PluginOptions, exporter: SpanExporter): opente
       enabled: pluginOptions.grpc,
       path: '@opentelemetry/plugin-grpc',
     },
-    express: {
-      enabled: pluginOptions.express,
-      path: '@opentelemetry/plugin-express',
-    }
   };
   const provider = new NodeTracerProvider({
     logger: new ConsoleLogger(LogLevel.DEBUG),
