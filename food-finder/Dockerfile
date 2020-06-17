@@ -6,6 +6,7 @@ COPY food-finder ./food-finder
 COPY tsconfig.base.json .
 COPY data ./data
 COPY proto ./proto
+COPY trace ./trace
 WORKDIR /app/food-finder
 RUN ["npm", "install"]
 RUN ["npm", "run", "build"]

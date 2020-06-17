@@ -2,6 +2,7 @@ FROM node
 WORKDIR /app
 COPY data ./data
 COPY proto ./data
+COPY trace ./trace
 COPY food-item-lookup/ ./food-item-lookup
 COPY tsconfig.base.json .
 ENV PORT=50053
