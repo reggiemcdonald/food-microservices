@@ -2,8 +2,7 @@ import 'mocha';
 import * as assert from 'assert';
 import FoodSupplier, {makeCatalog, makeVendors} from '../src/food-supplier';
 import {Catalog, IdFinder, VendorMap} from '../src/types';
-import { Tracer } from '@opentelemetry/api';
-import { newTestTracer } from '../src/trace';
+import { newTestTracer } from 'food-tracer';
 
 const catalog: Catalog = {
   '100': [

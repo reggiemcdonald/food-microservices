@@ -4,7 +4,7 @@ import { SupplierService } from '../src/supplier';
 import { FindItemResponse, FoodItemAvailability, Vendor, ItemReport } from '../src/types';
 import { VendorService } from '../src/vendor';
 import FoodFinder from '../src/food-finder';
-import { newTestTracer } from '../src/trace';
+import { newTestTracer } from 'food-tracer';
 
 const foodVendorA: Vendor = {
   id: '001',

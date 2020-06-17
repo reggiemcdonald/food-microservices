@@ -1,13 +1,10 @@
-import { newDefaultTracer } from './trace';
-const tracer = newDefaultTracer({
-  grpc: true,
-});
+import { newDefaultTracer } from 'food-tracer';
+const tracer = newDefaultTracer();
 
 import {join} from 'path';
 import * as grpc from 'grpc';
 import * as protoloader from '@grpc/proto-loader';
 import {readFileSync} from 'fs';
-import { TraceExporter } from '@google-cloud/opentelemetry-cloud-trace-exporter';
 import {Catalog, VendorMap} from './types';
 import FoodSupplier, { makeCatalog, makeVendors } from './food-supplier';
 

@@ -1,9 +1,6 @@
-import { newDefaultTracer } from './trace';
+import { newDefaultTracer } from 'food-tracer';
 
-const tracer = newDefaultTracer({
-  grpc: true,
-  express: true,
-});
+const tracer = newDefaultTracer();
 
 import express from 'express';
 import DefaultSupplierService, { SupplierService } from './supplier';

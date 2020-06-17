@@ -11,7 +11,6 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "@google-cloud/opentelemetry-cloud-trace-exporter": "^0.3.0",
     "@grpc/proto-loader": "^0.5.4",
     "@opentelemetry/api": "^0.8.3",
     "@opentelemetry/core": "^0.8.3",
@@ -20,6 +19,7 @@
     "@opentelemetry/plugin-https": "^0.8.3",
     "@opentelemetry/tracing": "^0.8.3",
     "axios": "^0.19.2",
+    "food-tracer": "file:../trace",
     "grpc": "^1.24.3",
     "typescript": "^3.9.5"
   },
