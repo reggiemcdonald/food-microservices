@@ -95,11 +95,10 @@ export class DefaultIdFinder implements IdFinder {
       if (itemLookupApiPort === '') {
         throw new Error('missing or invalid port for item name lookup api');
       }
-      const req = await axios.get(`http://food-item-lookup:${itemLookupApiPort}/api/nameLookup?name=${synonym}`);
+      const req = await axios.get(`http://food-item-lookup:${itemLookupApiPort}/api/nameLookup?name=${encodeURI(synonym)}`);
       return req.data;
     } finally {
       span.end();
     }
   }
 }
-
