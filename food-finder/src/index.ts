@@ -1,4 +1,4 @@
-import { newDefaultTracer } from 'food-tracer';
+import { newDefaultTracer } from './trace';
 
 const tracer = newDefaultTracer();
 
