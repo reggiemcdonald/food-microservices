@@ -2,6 +2,7 @@ import 'mocha';
 import FoodVendor,{makeVendors} from '../src/food-vendor';
 import * as assert from 'assert';
 import { InventoryItem } from '../src/types';
+import { newTestTracer } from '../src/trace';
 
 const vendorA = {id: '001', name: 'Food Vendor A'};
 const vendorB = {id: '002', name: 'Food Vendor B'};
@@ -14,9 +15,10 @@ const stockC = {vendorId: '002', itemId: '100', quantity: 3, price: 3.66};
 describe('FoodVendor::getItemAvailability', () => {
   let foodVendor: FoodVendor;
   beforeEach(() => {
-    foodVendor = new FoodVendor(
-      makeVendors([vendorA, vendorB], [itemA, itemB], [stockA, stockB, stockC])
+    const vendors = makeVendors([vendorA, vendorB], 
+      [itemA, itemB], [stockA, stockB, stockC]
     );
+    foodVendor = new FoodVendor(vendors, newTestTracer());
   });
   it('should return an available item', () => {
     const expectedInventoryItem: InventoryItem = {
