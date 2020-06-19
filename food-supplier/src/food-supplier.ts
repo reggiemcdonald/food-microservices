@@ -51,9 +51,13 @@ export default class FoodSupplier {
       const vendors = vendorIdsCarryingItem.map(vendorId => {
         return {id: vendorId, name: this.vendorMap[vendorId]};
       });
+      this.randomDelay();
       callback(null, {itemId, vendors});
       span.end();
     });
+  }
+  private randomDelay() {
+    for (let i = 0; i < Math.random() * 80000; i++) {}
   }
 }
 

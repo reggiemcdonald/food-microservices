@@ -37,9 +37,14 @@ export default class FoodVendor {
       span.end();
       return;
     }
+    this.randomDelay();
     span.addEvent('FoodVendor: found item', {item});
     span.end();
     callback(null, item);
+  }
+
+  private randomDelay() {
+    for (let i = 0; i < Math.random() * 50000; i++) {}
   }
 }
 
