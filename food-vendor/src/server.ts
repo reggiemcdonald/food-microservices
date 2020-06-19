@@ -8,6 +8,7 @@ import * as grpc from 'grpc';
 import * as protoloader from '@grpc/proto-loader';
 import { VendorMap } from './types';
 import FoodVendor, {makeVendors} from './food-vendor';
+import { newTestMeterProvider } from './meter';
 
 const startServer = () => {
   const vendorMap: VendorMap = makeVendors(
@@ -15,7 +16,7 @@ const startServer = () => {
     JSON.parse(readFileSync(join(__dirname, '../../../data/items.json'), {encoding: 'utf-8'})),
     JSON.parse(readFileSync(join(__dirname, '/../../../data/stock.json'), {encoding: 'utf-8'}))
   );
-  const foodVendor = new FoodVendor(vendorMap, tracer);
+  const foodVendor = new FoodVendor(vendorMap, tracer, newTestMeterProvider());
   const port = process.env.PORT;
   if (!port || port === '') {
     console.log('missing environment variable PORT');

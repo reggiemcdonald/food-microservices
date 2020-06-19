@@ -2,6 +2,7 @@ import { ConsoleLogger, LogLevel, ProbabilitySampler } from '@opentelemetry/core
 import { NodeTracerProvider } from '@opentelemetry/node';
 import { SpanExporter, ConsoleSpanExporter, Tracer, BatchSpanProcessor } from '@opentelemetry/tracing';
 import { TraceExporter } from '@google-cloud/opentelemetry-cloud-trace-exporter';
+import { MeterProvider } from '@opentelemetry/metrics';
 
 const newTracer = (exporter: SpanExporter): Tracer => {
   const provider = new NodeTracerProvider({

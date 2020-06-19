@@ -1,13 +1,32 @@
 import { VendorMap } from './types';
 import { Tracer } from '@opentelemetry/tracing';
+import { ValueRecorder } from '@opentelemetry/api';
+import { Meter } from '@opentelemetry/metrics';
+
+interface Metrics {
+  vendorRecorder: ValueRecorder;
+  itemRecorder: ValueRecorder;
+}
 
 export default class FoodVendor {
   data: VendorMap;
   tracer: Tracer;
+  metrics: Metrics;
+  meter: Meter;
 
-  constructor(data: VendorMap, tracer: Tracer) {
+  constructor(data: VendorMap, tracer: Tracer, meter: Meter) {
     this.data = data;
     this.tracer = tracer;
+    // Add metrics
+    this.meter = meter;
+    this.metrics = {
+      vendorRecorder: this.meter.createValueRecorder('vendors', {
+        description: 'a record of the vendors that are being queried for'
+      }),
+      itemRecorder: this.meter.createValueRecorder('items', {
+        description: 'a record of the items that are being queried for'
+      }),
+    };
   }
 
   getItemAvailability(call: any, callback: any): void {
@@ -27,6 +46,7 @@ export default class FoodVendor {
       span.end();
       return;
     }
+    this.metrics.vendorRecorder.record(Number(request.vendorId));
     const item = vendor.inventory[request.itemId];
     if (item === undefined) {
       const error = new Error(`item ${request.itemId} is not available`);
@@ -37,6 +57,7 @@ export default class FoodVendor {
       span.end();
       return;
     }
+    this.metrics.itemRecorder.record(Number(request.itemId));
     this.randomDelay();
     span.addEvent('FoodVendor: found item', {item});
     span.end();
