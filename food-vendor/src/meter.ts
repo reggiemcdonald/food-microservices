@@ -1,11 +1,14 @@
-import { MeterProvider, MetricExporter, Meter, CounterMetric, ConsoleMetricExporter, MetricDescriptor } from '@opentelemetry/metrics';
-import { ValueRecorder } from '@opentelemetry/api';
+import { MeterProvider,
+  MetricExporter,
+  Meter,
+  ConsoleMetricExporter,
+} from '@opentelemetry/metrics';
 import { MetricExporter as CloudMonitoringMetricExporter } from '@google-cloud/opentelemetry-cloud-monitoring-exporter'
 
 const newMeterProvider = (exporter: MetricExporter): Meter => {
   return new MeterProvider({
     exporter,
-    interval: 6000,
+    interval: 0,
   }).getMeter('food-finder-meter');
 };
 
@@ -14,11 +17,10 @@ export const newDefaultMeterProvider = (): Meter  => {
   if (!projectId) {
     throw new Error('missing required environment variable PROJECT_ID');
   }
-  const exporter: MetricExporter = new CloudMonitoringMetricExporter({projectId});
-  return newMeterProvider(exporter);
+  const exporter: unknown = new CloudMonitoringMetricExporter({projectId});
+  return newMeterProvider(exporter as MetricExporter);
 };
 
 export const newTestMeterProvider = (): Meter => {
   return newMeterProvider(new ConsoleMetricExporter());
 };
-
