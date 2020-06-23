@@ -1,11 +1,12 @@
 import { VendorMap } from './types';
 import { Tracer } from '@opentelemetry/tracing';
-import { ValueRecorder } from '@opentelemetry/api';
+import { ValueRecorder, Counter } from '@opentelemetry/api';
 import { Meter } from '@opentelemetry/metrics';
 
 interface Metrics {
-  vendorRecorder: ValueRecorder;
-  itemRecorder: ValueRecorder;
+  invalidVendorErrorCount: Counter;
+  invalidItemErrorCount: Counter;
+  otherErrorCount: Counter;
 }
 
 export default class FoodVendor {
@@ -20,17 +21,27 @@ export default class FoodVendor {
     // Add metrics
     this.meter = meter;
     this.metrics = {
-      vendorRecorder: this.meter.createValueRecorder('vendors', {
-        description: 'a record of the vendors that are being queried for'
+      invalidVendorErrorCount: this.meter.createCounter('invalid-vendors', {
+        description: 'a count of the number of times an ' +
+          'invalid vendor ID is used to query the system',
       }),
-      itemRecorder: this.meter.createValueRecorder('items', {
-        description: 'a record of the items that are being queried for'
+      invalidItemErrorCount: this.meter.createCounter('invalid-items', {
+        description: 'a count of the number of times an ' +
+          'invalid item ID is used to query the system',
+      }),
+      otherErrorCount: this.meter.createCounter('misc-errors', {
+        description: 'a count of random errors'
       }),
     };
   }
 
   getItemAvailability(call: any, callback: any): void {
     const {request} = call;
+    if (!request.vendorId || !request.itemId) {
+      this.metrics.otherErrorCount.add(1);
+      callback(new Error('missing itemId or vendorId in request'), null);
+      return;
+    }
     const vendor = this.data && this.data[request.vendorId];
     const span = this.tracer.startSpan('FoodVendor::getItemAvailability', {
       parent: this.tracer.getCurrentSpan(),
@@ -39,25 +50,26 @@ export default class FoodVendor {
       }
     });
     if (!vendor) {
-      callback(new Error('vendor does not exist'), null);
-      span.addEvent('error: FoodVendor', {
-        message: 'vendor does not exist',
-      });
-      span.end();
-      return;
-    }
-    this.metrics.vendorRecorder.record(Number(request.vendorId));
-    const item = vendor.inventory[request.itemId];
-    if (item === undefined) {
-      const error = new Error(`item ${request.itemId} is not available`);
+      const error = new Error('vendor does not exist');
       callback(error, null);
+      this.metrics.invalidVendorErrorCount.add(1);
       span.addEvent('error: FoodVendor', {
         message: error.message,
       });
       span.end();
       return;
     }
-    this.metrics.itemRecorder.record(Number(request.itemId));
+    const item = vendor.inventory[request.itemId];
+    if (item === undefined) {
+      const error = new Error(`item ${request.itemId} is not available`);
+      callback(error, null);
+      this.metrics.invalidItemErrorCount.add(1);
+      span.addEvent('error: FoodVendor', {
+        message: error.message,
+      });
+      span.end();
+      return;
+    }
     this.randomDelay();
     span.addEvent('FoodVendor: found item', {item});
     span.end();
@@ -65,7 +77,7 @@ export default class FoodVendor {
   }
 
   private randomDelay() {
-    for (let i = 0; i < Math.random() * 50000; i++) {}
+    for (let i = 0; i < Math.random() * 5000000; i++) {}
   }
 }
 
