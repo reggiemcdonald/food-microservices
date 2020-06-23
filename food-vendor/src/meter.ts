@@ -10,7 +10,7 @@ import { ConsoleLogger, LogLevel } from '@opentelemetry/core';
 const newMeterProvider = (exporter: MetricExporter): Meter => {
   return new MeterProvider({
     exporter,
-    interval: 0,
+    interval: 60000,
     logger: new ConsoleLogger(LogLevel.DEBUG),
     logLevel: LogLevel.DEBUG,
   }).getMeter('food-finder-meter');
@@ -21,7 +21,10 @@ export const newDefaultMeterProvider = (): Meter  => {
   if (!projectId) {
     throw new Error('missing required environment variable PROJECT_ID');
   }
-  const exporter: unknown = new CloudMonitoringMetricExporter({projectId});
+  const exporter: unknown = new CloudMonitoringMetricExporter({
+    projectId,
+    logger: new ConsoleLogger(LogLevel.DEBUG),
+  });
   return newMeterProvider(exporter as MetricExporter);
 };
 
