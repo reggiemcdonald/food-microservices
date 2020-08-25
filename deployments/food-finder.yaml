@@ -28,6 +28,9 @@ spec:
     spec:
       containers:
       - name: food-finder
-        image: {{FOOD_FINDER_IMAGE}}
+        image: ${IMAGE_NAME}
         ports:
         - containerPort: 8080
+        env:
+        - name: PROJECT_ID
+          value: ${PROJECT_ID}

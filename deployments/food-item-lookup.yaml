@@ -26,7 +26,10 @@ spec:
     spec:
       containers:
       - name: food-item-lookup
-        image: {{FOOD_ITEM_LOOKUP_IMAGE}}
+        image: ${IMAGE_NAME}
         ports:
         - containerPort: 50053
+        env:
+        - name: PROJECT_ID
+          value: ${PROJECT_ID}
 

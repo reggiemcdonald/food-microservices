@@ -1,24 +1,83 @@
 import { VendorMap } from './types';
+import { Tracer } from '@opentelemetry/tracing';
+import { ValueRecorder, Counter } from '@opentelemetry/api';
+import { Meter } from '@opentelemetry/metrics';
+
+interface Metrics {
+  invalidVendorErrorCount: Counter;
+  invalidItemErrorCount: Counter;
+  otherErrorCount: Counter;
+}
 
 export default class FoodVendor {
   data: VendorMap;
-  constructor(data: VendorMap) {
+  tracer: Tracer;
+  metrics: Metrics;
+  meter: Meter;
+
+  constructor(data: VendorMap, tracer: Tracer, meter: Meter) {
     this.data = data;
+    this.tracer = tracer;
+    // Add metrics
+    this.meter = meter;
+    this.metrics = {
+      invalidVendorErrorCount: this.meter.createCounter('invalid-vendors', {
+        description: 'a count of the number of times an ' +
+          'invalid vendor ID is used to query the system',
+      }),
+      invalidItemErrorCount: this.meter.createCounter('invalid-items', {
+        description: 'a count of the number of times an ' +
+          'invalid item ID is used to query the system',
+      }),
+      otherErrorCount: this.meter.createCounter('misc-errors', {
+        description: 'a count of random errors'
+      }),
+    };
   }
+
   getItemAvailability(call: any, callback: any): void {
-    // TODO: Add random delays to slow the call down
     const {request} = call;
+    if (!request.vendorId || !request.itemId) {
+      this.metrics.otherErrorCount.add(1);
+      callback(new Error('missing itemId or vendorId in request'), null);
+      return;
+    }
     const vendor = this.data && this.data[request.vendorId];
+    const span = this.tracer.startSpan('FoodVendor::getItemAvailability', {
+      parent: this.tracer.getCurrentSpan(),
+      attributes: {
+        vendor,  
+      }
+    });
     if (!vendor) {
-      callback(new Error('vendor does not exist'), null);
+      const error = new Error('vendor does not exist');
+      callback(error, null);
+      this.metrics.invalidVendorErrorCount.add(1);
+      span.addEvent('error: FoodVendor', {
+        message: error.message,
+      });
+      span.end();
       return;
     }
     const item = vendor.inventory[request.itemId];
     if (item === undefined) {
-      callback(new Error(`item ${request.itemId} is not available`), null);
+      const error = new Error(`item ${request.itemId} is not available`);
+      callback(error, null);
+      this.metrics.invalidItemErrorCount.add(1);
+      span.addEvent('error: FoodVendor', {
+        message: error.message,
+      });
+      span.end();
       return;
     }
+    this.randomDelay();
+    span.addEvent('FoodVendor: found item', {item});
+    span.end();
     callback(null, item);
+  }
+
+  private randomDelay() {
+    for (let i = 0; i < Math.random() * 5000000; i++) {}
   }
 }
 

@@ -4,6 +4,7 @@ import { SupplierService } from '../src/supplier';
 import { FindItemResponse, FoodItemAvailability, Vendor, ItemReport } from '../src/types';
 import { VendorService } from '../src/vendor';
 import FoodFinder from '../src/food-finder';
+import { newTestTracer } from '../src/trace';
 
 const foodVendorA: Vendor = {
   id: '001',
@@ -62,7 +63,8 @@ describe('FoodFinder::findItemByName', () => {
   let foodFinder: FoodFinder;
   
   beforeEach(() => {
-    foodFinder = new FoodFinder(mockSupplier, mockVendor);
+    foodFinder = 
+      new FoodFinder(mockSupplier, mockVendor, newTestTracer());
   });
 
   it('should successfully find item availability for an available item', async () => {

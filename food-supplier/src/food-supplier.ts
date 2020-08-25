@@ -1,39 +1,63 @@
 const axios = require('axios').default;
+import { Tracer } from '@opentelemetry/api';
 import {Catalog, VendorMap, IdFinder} from './types';
 
 export default class FoodSupplier {
+  tracer: Tracer;
   catalog: Catalog;
   vendorMap: VendorMap;
   idFinder: IdFinder;
 
-  constructor(catalog: Catalog, vendors: VendorMap, idFinder: IdFinder = new DefaultIdFinder()) {
+  constructor(tracer: Tracer, catalog: Catalog, vendors: VendorMap, idFinder?: IdFinder) {
     this.catalog = catalog;
+    this.tracer = tracer;
     this.vendorMap = vendors;
-    this.idFinder = idFinder;
+    if (!idFinder) {
+      this.idFinder = new DefaultIdFinder(tracer);
+    } else {
+      this.idFinder = idFinder;
+    }
   }
+
   async findItem(call: any, callback: any): Promise<any> {
     const {request} = call;
     const {itemName} = request;
-    if (!itemName) {
-      callback(new Error('missing itemName'), null);
-      return;
-    }
-    let itemId: string;
-    try {
-      itemId = await this.idFinder.getItemIdFromSynonym(itemName);
-    } catch (e) {
-      callback(new Error(`${itemName} is not a recognized item name`), null);
-      return;
-    }
-    const vendorIdsCarryingItem = this.catalog[itemId];
-    if (!vendorIdsCarryingItem) {
-      callback(new Error(`${itemName} is not carried by any vendors`), null);
-      return;
-    }
-    const vendors = vendorIdsCarryingItem.map(vendorId => {
-      return {id: vendorId, name: this.vendorMap[vendorId]};
+    const span = this.tracer.startSpan('FoodSupplier::findItem', {
+      attributes: {
+        itemName,
+      },
+      parent: this.tracer.getCurrentSpan(),
     });
-    callback(null, {itemId, vendors});
+    return this.tracer.withSpan(span, async () => {
+      if (!itemName) {
+        callback(new Error('missing itemName'), null);
+        span.end();
+        return;
+      }
+      let itemId: string;
+      try {
+        itemId = await this.idFinder.getItemIdFromSynonym(itemName);
+      } catch (e) {
+        callback(new Error(`${itemName} is not a recognized item name`), null);
+        span.end();
+        return;
+      }
+      const vendorIdsCarryingItem = this.catalog[itemId];
+      if (!vendorIdsCarryingItem) {
+        callback(new Error(`${itemName} is not carried by any vendors`), null);
+        span.end();
+        return;
+      }
+      const vendors = vendorIdsCarryingItem.map(vendorId => {
+        return {id: vendorId, name: this.vendorMap[vendorId]};
+      });
+      this.randomDelay();
+      callback(null, {itemId, vendors});
+      span.end();
+    });
+  }
+  private randomDelay() {
+    for (let i = 0; i < Math.random() * 80000; i++) {}
   }
 }
 
@@ -57,13 +81,28 @@ export const makeVendors = (vendors: any[]): VendorMap => {
 };
 
 export class DefaultIdFinder implements IdFinder {
+  tracer: Tracer;
+
+  constructor(tracer: Tracer) {
+    this.tracer = tracer;
+  }
+
   async getItemIdFromSynonym(synonym: string): Promise<string> {
     const itemLookupApiPort = process.env.ITEM_LOOKUP_API_PORT || '';
-    if (itemLookupApiPort === '') {
-      throw new Error('missing or invalid port for item name lookup api');
+    const span = this.tracer.startSpan('DefaultIdFinder::getItemIdFromSynonym', {
+      attributes: {
+        synonym,
+      },
+      parent: this.tracer.getCurrentSpan(),
+    });
+    try {
+      if (itemLookupApiPort === '') {
+        throw new Error('missing or invalid port for item name lookup api');
+      }
+      const req = await axios.get(`http://food-item-lookup:${itemLookupApiPort}/api/nameLookup?name=${encodeURI(synonym)}`);
+      return req.data;
+    } finally {
+      span.end();
     }
-    const req = await axios.get(`http://food-item-lookup:${itemLookupApiPort}/api/nameLookup?name=${synonym}`);
-    return req.data;
   }
 }
-

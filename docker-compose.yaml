@@ -1,0 +1,22 @@
+version: '2'
+services:
+  food-finder:
+    build:
+      context: .
+      dockerfile: food-finder/Dockerfile
+    image: ${REPO}/${PROJECT_ID}/food-finder:${TAG}
+  food-item-lookup:
+    build:
+      context: .
+      dockerfile: food-item-lookup/Dockerfile
+    image: ${REPO}/${PROJECT_ID}/food-item-lookup:${TAG}
+  food-supplier:
+    build:
+      context: .
+      dockerfile: food-supplier/Dockerfile
+    image: ${REPO}/${PROJECT_ID}/food-supplier:${TAG}
+  food-vendor:
+    build:
+      context: .
+      dockerfile: food-vendor/Dockerfile
+    image: ${REPO}/${PROJECT_ID}/food-vendor:${TAG}

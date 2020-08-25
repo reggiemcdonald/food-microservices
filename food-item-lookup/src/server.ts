@@ -1,3 +1,8 @@
+import {newDefaultTracer} from './trace';
+
+const tracer = newDefaultTracer();
+
+import {SpanKind} from '@opentelemetry/api';
 import express from 'express';
 import {readFileSync} from 'fs';
 import {join} from 'path';
@@ -13,16 +18,34 @@ const foodItemLookup = new FoodItemLookup(
 
 app.get('/api/nameLookup', (req, res) => {
   const name: string = req.query.name && req.query.name as string || '';
-  if (name === '') {
-    res.status(400).send();
-    return;
-  }
-  try {
-    const id = foodItemLookup.findItem(name);
-    res.status(200).send(id);
-  } catch (e) {
-    res.status(404).send();
-  }
+  const span = tracer.startSpan('/api/nameLookup', {
+    attributes: {
+      name,
+    },
+    parent: tracer.getCurrentSpan(),
+    kind: SpanKind.SERVER,
+  });
+  tracer.withSpan(span, () => {
+    if (name === '') {
+      res.status(400).send();
+      span.addEvent('error: find-item-lookup', {
+        message: 'item name was empty',
+      });
+      span.end();
+      return;
+    }
+    try {
+      const id = foodItemLookup.findItem(name);
+      res.status(200).send(id);
+    } catch (e) {
+      span.addEvent('error: find-item-lookup', {
+        message: e.message,
+      });
+      res.status(404).send();
+    } finally {
+      span.end();
+    }
+  });
 });
 
 const startServer = () => {

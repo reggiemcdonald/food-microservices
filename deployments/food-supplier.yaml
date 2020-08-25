@@ -26,6 +26,9 @@ spec:
     spec:
       containers:
       - name: food-supplier
-        image: {{FOOD_SUPPLIER_IMAGE}}
+        image: ${IMAGE_NAME}
         ports:
         - containerPort: 50052
+        env:
+        - name: PROJECT_ID
+          value: ${PROJECT_ID}
